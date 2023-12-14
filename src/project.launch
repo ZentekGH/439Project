@@ -1,0 +1,17 @@
+<launch> 
+  <rosparam command="load" file="$(find mobrob_util)/src/robot_info.yaml" />
+
+  <group ns="robot_operate">
+    <node pkg="final_project" name="wheel_control_node" type="wheel_control_node.py"/>
+    <node pkg="final_project" name="sensing_node" type="sensing_node.py"/>
+    <node pkg="final_project" name="sensors_processing_node" type="sensors_processing.py"/>
+  </group>
+
+  <group ns="robot_control">
+    <node pkg="final_project" name="dead_reckoning" type="dead_reckoning.py" />
+    <node pkg="final_project" name="closed_loop_path_follower" type="closed_loop_path_follower.py"/>    
+    <node pkg="final_project" name="waypoint_seeker" type="waypoint_seeker.py"/>
+    <node pkg="final_project" name="set_waypoints" type="set_waypoints.py"/>
+  </group>
+  
+</launch>
