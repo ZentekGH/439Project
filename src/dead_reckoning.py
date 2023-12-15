@@ -13,7 +13,7 @@ wheel_radius = wheel_diameter/2.0
 
 # Global variables for the robot's position
 r_center_world_estimated = np.array([0.,0.])    # Position (r) of the robot in the World frame. 
-theta_estimated = 0.                   # heading angle (theta) of the robot relative to the World frame. 
+theta_estimated = 0.                            # heading angle (theta) of the robot relative to the World frame. 
 
 # Global variables for the robot's wheel displacements (to keep knowledge of it from one step to the next)
 d_left_previous = 0.
@@ -21,7 +21,6 @@ d_right_previous = 0.
 
 # Rate to set how often the estimated "pose" is published
 f = 10.     # Hz 
-
 
 def listener(): 
     global r_center_world_estimated, theta_estimated

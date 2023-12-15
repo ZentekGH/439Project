@@ -14,7 +14,8 @@ import numpy as np
 # and actually import the message type by name (here "ME439SensorsRaw")
 from mobrob_util.msg import ME439SensorsRaw
 from mobrob_util.msg import ME439SensorsProcessed
-from std_msgs.msg import Float32
+from mobrob_util.msg import WallDetection
+from std_msgs.msg import Float32, Bool
 
 # Initialize globals
 t_previous = 0. 
@@ -41,6 +42,10 @@ pub = rospy.Publisher('/sensors_data_processed', ME439SensorsProcessed, queue_si
 # this is a publisher for the max velocity modifier taken from a3 (light/dark)
 pub_max_v = rospy.Publisher('/max_v_modifier', Float32, queue_size=1)
 
+# this is a publisher for the two ultrasonic sensors for wall detection
+pub_wall_front = rospy.Publisher('/wall_detected_front', Bool, queue_size = 1)
+pub_wall_left = rospy.Publisher('/wall_detected_left', Bool, queue_size = 1)
+
 def listener(): 
     rospy.init_node('sensors_processing_node', anonymous=False)
     sub = rospy.Subscriber('/sensors_data_raw', ME439SensorsRaw, sensors_process) # Subscribe to the "sensors_data_raw" topic
@@ -50,7 +55,7 @@ def listener():
 
 def sensors_process(msg_in):
     # bring the Globals into this function's scope
-    global t_previous, e0_previous, e1_previous, e0_offset, e1_offset, encoder_counts_to_radians, initializing, pub
+    global t_previous, e0_previous, e1_previous, e0_offset, e1_offset, encoder_counts_to_radians, initializing, pub, pub_max_v, pub_wall_front, pub_wall_left
 
     try:     
         if initializing:
@@ -70,6 +75,20 @@ def sensors_process(msg_in):
                 msg_v.data = 0.0
             pub_max_v.publish(msg_v)
             rospy.loginfo(pub_max_v)
+            
+            # publish the wall detection message
+            msg_wall_f = Bool()
+            msg_wall_l = Bool()
+            if (msg_in.a5 < 25):
+                msg_wall_f.data = True
+            else:
+                msg_wall_f.data = False
+            if (msg_in.a4 < 35):
+                msg_wall_l.data = True
+            else:
+                msg_wall_l.data = False
+            pub_wall_front.publish(msg_wall_f)
+            pub_wall_left.publish(msg_wall_l)
 
             msg_out = ME439SensorsProcessed()
             

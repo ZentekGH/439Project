@@ -9,6 +9,7 @@ import traceback
 # we import it "from" the ROS package we created it in (here "me439robot") with an extension of .msg ...
 # and actually import the message type by name (here "ME439SensorsRaw" and others)
 from mobrob_util.msg import ME439SensorsRaw
+from std_msgs.msg import Float32
 
 
 #==============================================================================
@@ -41,6 +42,8 @@ def talker():
 def serial_port_publisher():
 # Create the publisher for the topic "/sensors_data_raw", with message type "ME439SensorsRaw"
     pub_sensors = rospy.Publisher('/sensors_data_raw', ME439SensorsRaw, queue_size=10)
+    pub_test2 = rospy.Publisher('/test2', Float32, queue_size=0)
+    numba = 0
     
     # Data comes in on the Serial port. Set that up and start it. 
     #----------setup serial--------------
@@ -74,6 +77,7 @@ def serial_port_publisher():
     ser.flushInput()  # Flush again to avoid backlogs. 
     # MAIN LOOP to keep loading the message with new data. 
     while not rospy.is_shutdown():
+
         # set all the "new data" variables to zero. 
         newe0 = 0
         newe1 = 0
@@ -125,7 +129,7 @@ def serial_port_publisher():
             elif data_type == 'A5':
                 pub_sensors_message.a5 = data_value
                 newa5 = 1
-#                print(a5)
+#               
             elif data_type == 'U0':
                 pub_sensors_message.u0 = data_value
                 newu0 = 1

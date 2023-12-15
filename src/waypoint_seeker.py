@@ -22,11 +22,20 @@ waypoint_complete.data = False
 pub_segment_specs = rospy.Publisher('/path_segment_spec', ME439PathSpecs, queue_size=1)
 pub_waypoint_complete = rospy.Publisher('/waypoint_complete', Bool, queue_size=1)
 
+# callback for set_waypoints, sets waypoint complete without actually getting to it
+def override_waypoint_complete(msg_in):
+    global waypoint_complete, pub_waypoint_complete
+    if (msg_in.data):
+        waypoint_complete.data = True
+        pub_waypoint_complete.publish(waypoint_complete)
+
 # start the node and create some subscribers
 def talker(): 
     # Actually launch a node called "waypoint_seeker"
     rospy.init_node('waypoint_seeker', anonymous=False)
     
+    sub_override_waypoint_complete = rospy.Subscriber('/override_waypoint_complete', Bool, override_waypoint_complete)
+
     # here's a subscriber to the estimated robot pose
     sub_robot_pose_estimated = rospy.Subscriber('/robot_pose_estimated', Pose2D, set_path_to_waypoint)
 
@@ -66,7 +75,7 @@ def set_path_to_waypoint(pose_msg_in):
         waypoint_complete.data = True
         pub_waypoint_complete.publish(waypoint_complete)
 
-    
+
 # callback for when we get a new waypoint, grabs the waypoint, resets values
 def set_waypoint(waypoint_msg_in): 
     global waypoint, waypoint_complete
